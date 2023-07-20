@@ -1,0 +1,7 @@
+class SimulatorCore
+{
+private:
+
+public:
+
+};
