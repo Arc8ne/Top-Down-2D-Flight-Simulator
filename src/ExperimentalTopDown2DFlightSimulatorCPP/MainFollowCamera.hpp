@@ -42,7 +42,7 @@ private:
 
 	int turnRate = 50;
 
-	int maxVelocity = 200;
+	int maxVelocity = 300;
 
 	int velocity = 0;
 
