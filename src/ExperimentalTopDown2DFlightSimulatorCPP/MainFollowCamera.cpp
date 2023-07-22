@@ -15,7 +15,7 @@ void MainFollowCamera::RegulateVelocity()
 	}
 }
 
-void MainFollowCamera::RegularAltitude()
+void MainFollowCamera::RegulateAltitude()
 {
 	if (this->altitude < 0)
 	{
@@ -26,24 +26,42 @@ void MainFollowCamera::RegularAltitude()
 void MainFollowCamera::UpdateAirspeedLabel()
 {
 	this->airspeedLabelPtr->set_text(
-		"Airspeed: " + godot::String::num(this->velocity) + (godot::String)" kts"
+		godot::String::num(this->velocity) + (godot::String)" kts"
 	);
+
+	// godot::Godot::print("Lift: " + this->GetLift());
 }
 
 void MainFollowCamera::UpdateAltitudeLabel()
 {
 	this->altitudeLabelPtr->set_text(
-		"Altitude: " + godot::String::num(this->altitude) + (godot::String)" ft"
+		godot::String::num(this->altitude) + (godot::String)" ft"
 	);
+
+	if (this->altitude < this->lowAltitude)
+	{
+		this->altitudeLabelPtr->add_color_override(
+			"font_color",
+			this->redColor
+		);
+	}
+	else
+	{
+		this->altitudeLabelPtr->add_color_override(
+			"font_color",
+			this->whiteColor
+		);
+	}
 }
 
 void MainFollowCamera::UpdateShadowBasedOnAltitude()
 {
+	this->shadowOffset.x = this->altitude * -0.2;
+
+	this->shadowOffset.y = this->altitude * 0.2;
+
 	this->aircraftShadowPtr->set_position(
-		this->aircraftSpritePtr->get_position() + godot::Vector2(
-			this->altitude * -0.2,
-			this->altitude * 0.2
-		)
+		this->aircraftSpritePtr->get_position() + this->shadowOffset
 	);
 }
 
@@ -52,6 +70,24 @@ void MainFollowCamera::UpdateShadowBasedOnRotation()
 	this->aircraftShadowPtr->set_rotation(
 		this->aircraftSpritePtr->get_rotation()
 	);
+}
+
+void MainFollowCamera::UpdateHUDBasedOnCameraZoom()
+{
+	// return;
+
+	this->hudVBoxContainerPtr->set_position(
+		this->get_viewport_rect().size / 2 + godot::Vector2(40, 40)
+	);
+}
+
+godot::Vector2 MainFollowCamera::GetLift()
+{
+	godot::Vector2 lift = godot::Vector2(0, 0);
+
+	lift = (1.0 / 2.0) * 1.0 * (this->velocity * this->velocity) * 1.0 * this->aircraftSpritePtr->get_rect().get_size();
+
+	return lift;
 }
 
 void MainFollowCamera::_register_methods()
@@ -78,17 +114,23 @@ void MainFollowCamera::_ready()
 		this->get_node("AircraftShadowSprite")
 	);
 
+	this->hudVBoxContainerPtr = godot::Object::cast_to<godot::VBoxContainer>(
+		this->get_node("/root/MainWorld/HUDCanvasLayer/HUDVBoxContainer")
+	);
+
 	this->airspeedLabelPtr = godot::Object::cast_to<godot::Label>(
-		this->get_node("HUDCanvasLayer/HUDVBoxContainer/AirspeedLabel")
+		this->hudVBoxContainerPtr->get_node("AirspeedLabel")
 	);
 
 	this->altitudeLabelPtr = godot::Object::cast_to<godot::Label>(
-		this->get_node("HUDCanvasLayer/HUDVBoxContainer/AltitudeLabel")
+		this->hudVBoxContainerPtr->get_node("AltitudeLabel")
 	);
 
 	this->UpdateAirspeedLabel();
 
 	this->UpdateAltitudeLabel();
+
+	this->UpdateHUDBasedOnCameraZoom();
 }
 
 void MainFollowCamera::_input(godot::InputEvent* inputEventPtr)
@@ -139,7 +181,9 @@ void MainFollowCamera::_physics_process(float delta)
 
 	if (this->keyToPressedStatusMap[godot::GlobalConstants::KEY_W] == true)
 	{
-		this->altitude += this->ascentRate;
+		this->altitude += 1;
+
+		this->RegulateAltitude();
 
 		this->UpdateAltitudeLabel();
 
@@ -147,13 +191,26 @@ void MainFollowCamera::_physics_process(float delta)
 	}
 	else if (this->keyToPressedStatusMap[godot::GlobalConstants::KEY_S] == true)
 	{
-		this->altitude -= this->descentRate;
+		this->altitude -= 1;
 
-		this->RegularAltitude();
+		this->RegulateAltitude();
 
 		this->UpdateAltitudeLabel();
 
 		this->UpdateShadowBasedOnAltitude();
+	}
+
+	if (this->keyToPressedStatusMap[godot::GlobalConstants::BUTTON_WHEEL_UP] == true)
+	{
+		this->set_zoom(
+			this->get_zoom() + godot::Vector2(0.1, 0.1)
+		);
+	}
+	else if (this->keyToPressedStatusMap[godot::GlobalConstants::BUTTON_WHEEL_DOWN] == true)
+	{
+		this->set_zoom(
+			this->get_zoom() - godot::Vector2(0.1, 0.1)
+		);
 	}
 
 	this->set_position(

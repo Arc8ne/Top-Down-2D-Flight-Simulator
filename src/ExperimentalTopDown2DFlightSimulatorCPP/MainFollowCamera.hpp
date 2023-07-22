@@ -16,6 +16,16 @@
 
 #include <Label.hpp>
 
+#include <Vector2.hpp>
+
+#include <VBoxContainer.hpp>
+
+#include <Viewport.hpp>
+
+#include <Transform2D.hpp>
+
+#include <StyleBox.hpp>
+
 class MainFollowCamera : public godot::Camera2D
 {
 	GODOT_CLASS(MainFollowCamera, godot::Camera2D)
@@ -32,9 +42,7 @@ private:
 
 	int altitude = 0;
 
-	int ascentRate = 1;
-
-	int descentRate = 1;
+	double altitudeChangeRate = 0;
 
 	std::map<int, bool> keyToPressedStatusMap = std::map<int, bool>();
 
@@ -42,13 +50,23 @@ private:
 
 	godot::Sprite* aircraftShadowPtr = nullptr;
 
+	godot::VBoxContainer* hudVBoxContainerPtr = nullptr;
+
 	godot::Label* airspeedLabelPtr = nullptr;
 
 	godot::Label* altitudeLabelPtr = nullptr;
 
+	godot::Vector2 shadowOffset = godot::Vector2(0, 0);
+
+	godot::Color redColor = godot::Color(255, 0, 65, 1);
+
+	godot::Color whiteColor = godot::Color(255, 255, 255, 1);
+
+	int lowAltitude = 101;
+
 	void RegulateVelocity();
 
-	void RegularAltitude();
+	void RegulateAltitude();
 
 	void UpdateAirspeedLabel();
 
@@ -57,6 +75,10 @@ private:
 	void UpdateShadowBasedOnAltitude();
 
 	void UpdateShadowBasedOnRotation();
+
+	void UpdateHUDBasedOnCameraZoom();
+
+	godot::Vector2 GetLift();
 public:
 	static void _register_methods();
 
