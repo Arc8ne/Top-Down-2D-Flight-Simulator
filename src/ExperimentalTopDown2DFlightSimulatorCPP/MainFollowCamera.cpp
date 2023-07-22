@@ -90,6 +90,32 @@ godot::Vector2 MainFollowCamera::GetLift()
 	return lift;
 }
 
+void MainFollowCamera::OnInputMouseMotion(godot::InputEventMouseMotion* inputEventMouseMotionPtr)
+{
+
+}
+
+void MainFollowCamera::OnInputMouseButton(godot::InputEventMouseButton* inputEventMouseButtonPtr)
+{
+	if (inputEventMouseButtonPtr->is_pressed() == true)
+	{
+		int64_t buttonIndex = inputEventMouseButtonPtr->get_button_index();
+
+		if (buttonIndex == godot::GlobalConstants::BUTTON_WHEEL_UP)
+		{
+			this->set_zoom(
+				this->get_zoom() - godot::Vector2(0.1, 0.1)
+			);
+		}
+		else if (buttonIndex == godot::GlobalConstants::BUTTON_WHEEL_DOWN)
+		{
+			this->set_zoom(
+				this->get_zoom() + godot::Vector2(0.1, 0.1)
+			);
+		}
+	}
+}
+
 void MainFollowCamera::_register_methods()
 {
 	godot::register_method("_ready", &MainFollowCamera::_ready);
@@ -140,6 +166,14 @@ void MainFollowCamera::_input(godot::InputEvent* inputEventPtr)
 		godot::InputEventKey* inputEventKeyPtr = godot::Object::cast_to<godot::InputEventKey>(inputEventPtr);
 	
 		this->keyToPressedStatusMap[inputEventKeyPtr->get_scancode()] = inputEventPtr->is_pressed();
+	}
+	else if (inputEventPtr->is_class("InputEventMouseButton") == true)
+	{
+		this->OnInputMouseButton(
+			godot::Object::cast_to<godot::InputEventMouseButton>(
+				inputEventPtr
+			)
+		);
 	}
 }
 
@@ -198,19 +232,6 @@ void MainFollowCamera::_physics_process(float delta)
 		this->UpdateAltitudeLabel();
 
 		this->UpdateShadowBasedOnAltitude();
-	}
-
-	if (this->keyToPressedStatusMap[godot::GlobalConstants::BUTTON_WHEEL_UP] == true)
-	{
-		this->set_zoom(
-			this->get_zoom() + godot::Vector2(0.1, 0.1)
-		);
-	}
-	else if (this->keyToPressedStatusMap[godot::GlobalConstants::BUTTON_WHEEL_DOWN] == true)
-	{
-		this->set_zoom(
-			this->get_zoom() - godot::Vector2(0.1, 0.1)
-		);
 	}
 
 	this->set_position(

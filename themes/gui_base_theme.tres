@@ -1,0 +1,8 @@
+[gd_resource type="Theme" load_steps=2 format=2]
+
+[ext_resource path="res://fonts/clarity-city-regular-22-dynamicfont.tres" type="DynamicFont" id=1]
+
+[resource]
+Button/fonts/font = ExtResource( 1 )
+CheckButton/fonts/font = ExtResource( 1 )
+Label/fonts/font = ExtResource( 1 )

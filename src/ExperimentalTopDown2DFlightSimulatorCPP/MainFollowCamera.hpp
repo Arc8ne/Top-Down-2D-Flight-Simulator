@@ -26,6 +26,12 @@
 
 #include <StyleBox.hpp>
 
+#include <InputEventMouseMotion.hpp>
+
+#include <InputEventMouseButton.hpp>
+
+#include "SimulatorCore.hpp"
+
 class MainFollowCamera : public godot::Camera2D
 {
 	GODOT_CLASS(MainFollowCamera, godot::Camera2D)
@@ -79,6 +85,10 @@ private:
 	void UpdateHUDBasedOnCameraZoom();
 
 	godot::Vector2 GetLift();
+
+	void OnInputMouseMotion(godot::InputEventMouseMotion* inputEventMouseMotionPtr);
+
+	void OnInputMouseButton(godot::InputEventMouseButton* inputEventMouseButtonPtr);
 public:
 	static void _register_methods();
 
