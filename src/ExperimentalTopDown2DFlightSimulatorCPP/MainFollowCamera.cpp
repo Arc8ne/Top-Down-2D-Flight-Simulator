@@ -116,6 +116,11 @@ void MainFollowCamera::OnInputMouseButton(godot::InputEventMouseButton* inputEve
 	}
 }
 
+void MainFollowCamera::OnGPSCheckButtonToggled(bool isButtonPressed)
+{
+
+}
+
 void MainFollowCamera::_register_methods()
 {
 	godot::register_method("_ready", &MainFollowCamera::_ready);
@@ -132,6 +137,12 @@ void MainFollowCamera::_init()
 
 void MainFollowCamera::_ready()
 {
+	SimulatorCore::instancePtr->GenerateWorld(
+		godot::Object::cast_to<godot::Node2D>(
+			this->get_node("/root/MainWorld")
+		)
+	);
+
 	this->aircraftSpritePtr = godot::Object::cast_to<godot::Sprite>(
 		this->get_node("AircraftSprite")
 	);
@@ -141,7 +152,7 @@ void MainFollowCamera::_ready()
 	);
 
 	this->hudVBoxContainerPtr = godot::Object::cast_to<godot::VBoxContainer>(
-		this->get_node("/root/MainWorld/HUDCanvasLayer/HUDVBoxContainer")
+		this->get_node("HUDCanvasLayer/HUDVBoxContainer")
 	);
 
 	this->airspeedLabelPtr = godot::Object::cast_to<godot::Label>(
@@ -150,6 +161,18 @@ void MainFollowCamera::_ready()
 
 	this->altitudeLabelPtr = godot::Object::cast_to<godot::Label>(
 		this->hudVBoxContainerPtr->get_node("AltitudeLabel")
+	);
+
+	this->gpsCheckButtonPtr = godot::Object::cast_to<godot::CheckButton>(
+		this->get_node(
+			"HUDCanvasLayer/TopRightVBoxContainer/GPSCheckButton"
+		)
+	);
+
+	this->gpsCheckButtonPtr->connect(
+		"toggled",
+		this,
+		"OnGPSCheckButtonToggled"
 	);
 
 	this->UpdateAirspeedLabel();

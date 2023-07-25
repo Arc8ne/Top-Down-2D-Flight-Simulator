@@ -30,6 +30,8 @@
 
 #include <InputEventMouseButton.hpp>
 
+#include <CheckButton.hpp>
+
 #include "SimulatorCore.hpp"
 
 class MainFollowCamera : public godot::Camera2D
@@ -68,6 +70,8 @@ private:
 
 	godot::Color whiteColor = godot::Color(255, 255, 255, 1);
 
+	godot::CheckButton* gpsCheckButtonPtr = nullptr;
+
 	int lowAltitude = 101;
 
 	void RegulateVelocity();
@@ -89,6 +93,8 @@ private:
 	void OnInputMouseMotion(godot::InputEventMouseMotion* inputEventMouseMotionPtr);
 
 	void OnInputMouseButton(godot::InputEventMouseButton* inputEventMouseButtonPtr);
+
+	void OnGPSCheckButtonToggled(bool isButtonPressed);
 public:
 	static void _register_methods();
 
